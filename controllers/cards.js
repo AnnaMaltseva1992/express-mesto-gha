@@ -38,12 +38,12 @@ const createCard = (req, res) => {
     name,
     link,
   } = req.body;
-  console.log(req.user._id);
-  Card
-    .create({
-      name,
-      link,
-    })
+
+  Card.create({
+    name,
+    link,
+    owner: req.user._id,
+  })
     .then((card) => res.status(201)
       .send(card))
     .catch((err) => {
