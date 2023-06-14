@@ -55,9 +55,65 @@ const createUser = (req, res) => {
     });
 };
 
+const updateUser = (req, res) => {
+  const {
+    name,
+    about,
+  } = req.body;
+  User
+    .findByIdAndUpdate(
+      req.user._id,
+      {
+        name,
+        about,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
+    .then((user) => res.status(200)
+      .send(user))
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return res.status(400)
+          .send({ message: 'Invalid data to update user' });
+      }
+
+      return res.status(500)
+        .send({ message: err.message });
+    });
+};
+
+const updateAvatar = (req, res) => {
+  const { avatar } = req.body;
+  User
+    .findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
+    .then((user) => res.status(200)
+      .send(user))
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400)
+          .send({ message: 'Invalid data to update avatar' });
+      } else {
+        res.status(500)
+          .send({ message: err.message });
+      }
+    });
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
+  updateUser,
+  updateAvatar,
 // eslint-disable-next-line eol-last
 };
