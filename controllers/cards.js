@@ -1,36 +1,17 @@
 const Card = require('../models/card');
+const {
+  ERROR_CODE_INCORRECT_DATA,
+  ERROR_CODE_NOT_FOUND,
+  ERROR_CODE_DEFAULT,
+  defaultErrorMessage,
+} = require('../errors/errors');
 
 const getCards = (req, res) => {
   Card
     .find({})
-    .then((cards) => res.status(200)
-      .send(cards))
-    .catch((err) => res.status(500)
-      .send({ message: err.message }));
-};
-
-const deleteCard = (req, res) => {
-  const { cardId } = req.params;
-  Card
-    .findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(404)
-          .send({ message: 'Not found: Invalid _id' });
-      }
-
-      return res.status(200)
-        .send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400)
-          .send({ message: 'Card with _id cannot be found' });
-      } else {
-        res.status(500)
-          .send({ message: err.message });
-      }
-    });
+    .then((cards) => res.send(cards))
+    .catch(() => res.status(ERROR_CODE_DEFAULT)
+      .send({ message: defaultErrorMessage }));
 };
 
 const createCard = (req, res) => {
@@ -48,11 +29,11 @@ const createCard = (req, res) => {
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
-          .send({ message: 'Invalid data for card creation' });
+        res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Incorrect card data' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        res.status(ERROR_CODE_DEFAULT)
+          .send({ message: defaultErrorMessage });
       }
     });
 };
@@ -66,21 +47,18 @@ const likeCard = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(404)
-          .send({ message: 'Not found: Invalid _id' });
+        return res.status(ERROR_CODE_NOT_FOUND)
+          .send({ message: 'Card is not found' });
       }
-
-      return res.status(200)
-        .send(card);
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400)
-          .send({ message: 'Invalid data to add like' });
+        return res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Incorrect card data' });
       }
-
-      return res.status(500)
-        .send({ message: err.message });
+      return res.status(ERROR_CODE_DEFAULT)
+        .send({ message: defaultErrorMessage });
     });
 };
 
@@ -93,21 +71,36 @@ const dislikeCard = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(404)
-          .send({ message: 'Not found: Invalid _id' });
+        return res.status(ERROR_CODE_NOT_FOUND)
+          .send({ message: 'Card is not found' });
       }
 
-      return res.status(200)
-        .send(card);
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400)
-          .send({ message: 'Invalid data to delete like' });
+        return res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Incorrect card data' });
       }
 
-      return res.status(500)
-        .send({ message: err.message });
+      return res.status(ERROR_CODE_DEFAULT)
+        .send({ message: defaultErrorMessage });
+    });
+};
+
+const deleteCard = (req, res) => {
+  Card.findByIdAndRemove(req.params.cardId)
+    .then((card) => {
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Incorrect card data' });
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Card is not found' });
+      }
+      return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
     });
 };
 
