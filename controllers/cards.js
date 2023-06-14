@@ -89,18 +89,24 @@ const dislikeCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  const { cardId } = req.params;
+  Card
+    .findByIdAndRemove(cardId)
     .then((card) => {
-      res.send(card);
+      if (!card) {
+        return res.status(ERROR_CODE_NOT_FOUND)
+          .send({ message: 'Card is not found' });
+      }
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Incorrect card data' });
+        res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Incorrect card data' });
+      } else {
+        res.status(ERROR_CODE_DEFAULT)
+          .send({ message: defaultErrorMessage });
       }
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Card is not found' });
-      }
-      return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
     });
 };
 

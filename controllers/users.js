@@ -27,11 +27,7 @@ const getUserById = (req, res) => {
         return res.status(ERROR_CODE_NOT_FOUND)
           .send({ message: 'User is not found' });
       } return res.status(ERROR_CODE_DEFAULT)
-        .send({
-          message: defaultErrorMessage,
-          err: err.message,
-          stack: err.stack,
-        });
+        .send({ message: defaultErrorMessage });
     });
 };
 
