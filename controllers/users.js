@@ -5,29 +5,29 @@ const getUsers = (req, res) => {
     .find({})
     .then((users) => res
       .status(200)
-      .send(users));
+      .send(users))
+    .catch((err) => res.status(500)
+      .send({ message: err.message }));
 };
 
 const getUserById = (req, res) => {
   User.findById(req.params._id)
-    .orFail(() => new Error('Not found'))
+    .orFail
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === 'Not found') {
-        res
-          .status(404)
-          .send({
-            message: 'User not found',
-          });
-      } else {
-        res
-          .status(500)
-          .send({
-            message: 'Internal Server Error',
-            err: err.message,
-            stack: err.stack,
-          });
+      if (err.name === 'CastError') {
+        return res.status(400)
+          .send({ message: 'Bad Request' });
       }
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(404)
+          .send({ message: 'User with _id cannot be found' });
+      } return res.status(500)
+        .send({
+          message: 'Internal Server Error',
+          err: err.message,
+          stack: err.stack,
+        });
     });
 };
 
@@ -44,13 +44,15 @@ const createUser = (req, res) => {
   })
     .then((user) => res.status(201)
       .send(user))
-    .catch((err) => res
-      .status(500)
-      .send({
-        message: 'Internal Server Error',
-        err: err.message,
-        stack: err.stack,
-      }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400)
+          .send({ message: 'Invalid data to create user' });
+      } else {
+        res.status(500)
+          .send({ message: err.message });
+      }
+    });
 };
 
 module.exports = {
