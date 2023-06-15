@@ -30,7 +30,7 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Incorrect card data' });
+          .send({ message: 'Переданы некорректные данные карточки' });
       } else {
         res.status(ERROR_CODE_DEFAULT)
           .send({ message: defaultErrorMessage });
@@ -48,14 +48,14 @@ const likeCard = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Card is not found' });
+          .send({ message: 'Карточка не найдена' });
       }
       return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Incorrect card data' });
+          .send({ message: 'Переданы некорректные данные карточки' });
       }
       return res.status(ERROR_CODE_DEFAULT)
         .send({ message: defaultErrorMessage });
@@ -72,7 +72,7 @@ const dislikeCard = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Card is not found' });
+          .send({ message: 'Карточка не найдена' });
       }
 
       return res.send(card);
@@ -80,7 +80,7 @@ const dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Incorrect card data' });
+          .send({ message: 'Переданы некорректные данные карточки' });
       }
 
       return res.status(ERROR_CODE_DEFAULT)
@@ -95,14 +95,14 @@ const deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Card is not found' });
+          .send({ message: 'Карточка не найдена' });
       }
       return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Incorrect card data' });
+          .send({ message: 'Переданы некорректные данные карточки' });
       } else {
         res.status(ERROR_CODE_DEFAULT)
           .send({ message: defaultErrorMessage });

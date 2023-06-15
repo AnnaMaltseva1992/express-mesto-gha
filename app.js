@@ -8,7 +8,7 @@ const router = require('./routes');
 
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/newproject', {
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
 });
 
@@ -20,7 +20,7 @@ const { PORT = 3000 } = process.env;
 app.use(express.json());
 app.use((req, res, next) => {
   req.user = {
-    _id: '6483195f87c00a02d787026a',
+    _id: '648ae7066ea552b78b4e6023',
   };
   next();
 });

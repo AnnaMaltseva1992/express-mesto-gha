@@ -21,11 +21,11 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Bad Request' });
+          .send({ message: 'Переданы некорректные данные пользователя' });
       }
       if (err.name === 'DocumentNotFoundError') {
         return res.status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'User is not found' });
+          .send({ message: 'Пользователь не найден' });
       } return res.status(ERROR_CODE_DEFAULT)
         .send({ message: defaultErrorMessage });
     });
@@ -47,7 +47,7 @@ const createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Incorrect user data' });
+          .send({ message: 'Переданы некорректные данные пользователя' });
       } else {
         res.status(ERROR_CODE_DEFAULT)
           .send({ message: defaultErrorMessage });
@@ -74,13 +74,15 @@ const updateUser = (req, res) => {
     )
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'User is not found' });
-      }
+      // if (err.name === 'DocumentNotFoundError') {
+      //   return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'User is not found' });
+      // }
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Incorrect profile data' });
+        return res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Переданы некорректные данные профиля' });
       }
-      return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
+      return res.status(ERROR_CODE_DEFAULT)
+        .send({ message: defaultErrorMessage });
     });
 };
 
@@ -98,12 +100,15 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'User is not found' });
+        return res.status(ERROR_CODE_NOT_FOUND)
+          .send({ message: 'Пользователь не найден' });
       }
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_INCORRECT_DATA).send({ message: 'Incorrect avatar data' });
+        return res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Переданы некорректные данные профиля' });
       }
-      return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
+      return res.status(ERROR_CODE_DEFAULT)
+        .send({ message: defaultErrorMessage });
     });
 };
 
