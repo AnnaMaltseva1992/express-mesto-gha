@@ -24,6 +24,9 @@ const getUserById = (req, res) => {
         return res.status(ERROR_CODE_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные пользователя' });
       }
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь не найден' });
+      }
       return res.status(ERROR_CODE_DEFAULT)
         .send({ message: defaultErrorMessage });
     });
