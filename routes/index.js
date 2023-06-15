@@ -6,7 +6,7 @@ router.use('/users', userRoutes);
 router.use('/cards', cardRoutes);
 router.use('/*', (req, res) => {
   res.status(404)
-    .send({ message: '404: Not Found' });
+    .send({ message: 'Профиль не найден' });
 });
 
 module.exports = router;

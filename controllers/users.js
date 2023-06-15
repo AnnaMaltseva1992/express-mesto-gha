@@ -15,7 +15,8 @@ const getUsers = (req, res) => {
 };
 
 const getUserById = (req, res) => {
-  User.findById(req.params._id)
+  const { userId } = req.params;
+  User.findById(userId)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -23,10 +24,7 @@ const getUserById = (req, res) => {
         return res.status(ERROR_CODE_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные пользователя' });
       }
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(ERROR_CODE_NOT_FOUND)
-          .send({ message: 'Пользователь не найден' });
-      } return res.status(ERROR_CODE_DEFAULT)
+      return res.status(ERROR_CODE_DEFAULT)
         .send({ message: defaultErrorMessage });
     });
 };
