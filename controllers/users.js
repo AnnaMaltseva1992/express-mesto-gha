@@ -78,7 +78,7 @@ const updateUser = (req, res) => {
       if (err.name === 'DocumentNotFoundError') {
         return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'User is not found' });
       }
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные профиля' });
       }
