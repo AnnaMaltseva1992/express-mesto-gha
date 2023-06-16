@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const {
+  RES_CODE_CREATED,
   ERROR_CODE_INCORRECT_DATA,
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_DEFAULT,
@@ -25,7 +26,7 @@ const createCard = (req, res) => {
     link,
     owner: req.user._id,
   })
-    .then((card) => res.status(201)
+    .then((card) => res.status(RES_CODE_CREATED)
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -78,7 +79,7 @@ const dislikeCard = (req, res) => {
       return res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные карточки' });
       }
