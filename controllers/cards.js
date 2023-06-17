@@ -2,6 +2,7 @@ const Card = require('../models/card');
 const {
   RES_CODE_CREATED,
   ERROR_CODE_INCORRECT_DATA,
+  ERROR_CODE_FORBIDDEN,
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_DEFAULT,
   defaultErrorMessage,
@@ -97,6 +98,10 @@ const deleteCard = (req, res) => {
       if (!card) {
         return res.status(ERROR_CODE_NOT_FOUND)
           .send({ message: 'Карточка не найдена' });
+      }
+      if (card.owner !== req.user._id) {
+        res.status(ERROR_CODE_FORBIDDEN)
+          .send({ message: 'Вы не можете удалять карточки других пользователей' });
       }
       return res.send(card);
     })

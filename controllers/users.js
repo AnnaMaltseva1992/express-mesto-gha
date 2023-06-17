@@ -1,4 +1,7 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 const {
   ERROR_CODE_INCORRECT_DATA,
   ERROR_CODE_NOT_FOUND,
@@ -12,6 +15,24 @@ const getUsers = (req, res) => {
     .then((users) => res.send(users))
     .catch(() => res.status(ERROR_CODE_DEFAULT)
       .send({ message: defaultErrorMessage }));
+};
+
+const getUser = (req, res) => {
+  User.findOne({ _id: req.user._id })
+    .then((user) => {
+      if (!user) {
+        return res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь не найден' });
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE_INCORRECT_DATA)
+          .send({ message: 'Переданы некорректные данные пользователя' });
+      }
+      return res.status(ERROR_CODE_DEFAULT)
+        .send({ message: defaultErrorMessage });
+    });
 };
 
 const getUserById = (req, res) => {
@@ -37,22 +58,29 @@ const createUser = (req, res) => {
     name,
     about,
     avatar,
+    email,
+    password,
   } = req.body;
-  User.create({
-    name,
-    about,
-    avatar,
-  })
-    .then((user) => res.status(201)
-      .send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные пользователя' });
-      } else {
-        res.status(ERROR_CODE_DEFAULT)
-          .send({ message: defaultErrorMessage });
-      }
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => res.status(201)
+          .send(user))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            res.status(ERROR_CODE_INCORRECT_DATA)
+              .send({ message: 'Переданы некорректные данные пользователя' });
+          } else {
+            res.status(ERROR_CODE_DEFAULT)
+              .send({ message: defaultErrorMessage });
+          }
+        });
     });
 };
 
@@ -73,6 +101,7 @@ const updateUser = (req, res) => {
         runValidators: true,
       },
     )
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
@@ -98,13 +127,14 @@ const updateAvatar = (req, res) => {
         runValidators: true,
       },
     )
+    .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res.status(ERROR_CODE_NOT_FOUND)
           .send({ message: 'Пользователь не найден' });
       }
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные профиля' });
       }
@@ -113,11 +143,28 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
 module.exports = {
   getUsers,
+  getUser,
   getUserById,
   createUser,
   updateUser,
   updateAvatar,
+  login,
 // eslint-disable-next-line eol-last
 };
