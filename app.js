@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 
 const { errors } = require('celebrate');
 
+const helmet = require('helmet');
+
 const { login, createUser } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
@@ -25,6 +27,7 @@ app.post('/signup', createUser);
 app.use(auth);
 
 app.use(errors());
+app.use(helmet());
 app.use(handleErrors);
 
 const router = require('./routes');
