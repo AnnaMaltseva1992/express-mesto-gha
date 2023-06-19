@@ -12,6 +12,8 @@ const auth = require('./middlewares/auth');
 
 const handleErrors = require('./middlewares/handleErrors');
 
+const { validationSignin, validationSignup } = require('./validation/validation');
+
 const app = express();
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
@@ -22,8 +24,6 @@ const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
 app.use(auth);
 
 app.use(errors());
@@ -33,6 +33,8 @@ app.use(handleErrors);
 const router = require('./routes');
 
 app.use(router);
+router.post('/signin', validationSignin, login);
+router.post('/signup', validationSignup, createUser);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
