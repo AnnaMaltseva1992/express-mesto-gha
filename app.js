@@ -2,13 +2,13 @@ const express = require('express');
 
 const mongoose = require('mongoose');
 
-const router = require('./routes');
+const { errors } = require('celebrate');
 
 const { login, createUser } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 
-const handleErrors = ('./middlewares/handleErrors');
+const handleErrors = require('./middlewares/handleErrors');
 
 const app = express();
 
@@ -20,13 +20,16 @@ const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 
-app.use(router);
-
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.use(auth);
 
+app.use(errors());
 app.use(handleErrors);
+
+const router = require('./routes');
+
+app.use(router);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
