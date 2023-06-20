@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
+// const UnauthorizedError = require('../errors/unauthorizedError');
 
 const getUsers = (req, res, next) => {
   User
@@ -98,9 +99,9 @@ const updateUser = (req, res, next) => {
       if (err.name === 'DocumentNotFoundError') {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      // if (err.name === 'ValidationError') {
-      //   return next(new BadRequestError('Переданы некорректные данные профиля'));
-      // }
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Переданы некорректные данные профиля'));
+      }
       return next(err);
     });
 };
