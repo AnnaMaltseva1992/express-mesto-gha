@@ -1,18 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-// const { RES_CODE_CREATED } = require('../errors/errors');
 
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
-
-// const {
-//   ERROR_CODE_INCORRECT_DATA,
-//   ERROR_CODE_NOT_FOUND,
-//   ERROR_CODE_DEFAULT,
-//   defaultErrorMessage,
-// } = require('../errors/errors');
 
 const getUsers = (req, res, next) => {
   User
@@ -43,9 +35,9 @@ const getUserById = (req, res, next) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Переданы некорректные данные пользователя'));
-      }
+      // if (err.name === 'CastError') {
+      //   return next(new BadRequestError('Переданы некорректные данные пользователя'));
+      // }
       if (err.name === 'DocumentNotFoundError') {
         return next(new NotFoundError('Пользователь не найден'));
       }
@@ -106,9 +98,9 @@ const updateUser = (req, res, next) => {
       if (err.name === 'DocumentNotFoundError') {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные профиля'));
-      }
+      // if (err.name === 'ValidationError') {
+      //   return next(new BadRequestError('Переданы некорректные данные профиля'));
+      // }
       return next(err);
     });
 };

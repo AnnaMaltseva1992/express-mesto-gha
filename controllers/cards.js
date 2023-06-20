@@ -1,12 +1,4 @@
 const Card = require('../models/card');
-// const {
-//   RES_CODE_CREATED,
-//   ERROR_CODE_INCORRECT_DATA,
-//   ERROR_CODE_FORBIDDEN,
-//   ERROR_CODE_NOT_FOUND,
-//   ERROR_CODE_DEFAULT,
-//   defaultErrorMessage,
-// } = require('../errors/errors');
 
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
