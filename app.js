@@ -6,13 +6,13 @@ const { errors } = require('celebrate');
 
 const helmet = require('helmet');
 
-const { login, createUser } = require('./controllers/users');
+// const { login, createUser } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 
 const handleErrors = require('./middlewares/handleErrors');
 
-const { validationSignin, validationSignup } = require('./validation/validation');
+// const { validationSignin, validationSignup } = require('./validation/validation');
 
 const app = express();
 
@@ -33,8 +33,8 @@ app.use(handleErrors);
 const router = require('./routes');
 
 app.use(router);
-router.post('/signin', validationSignin, login);
-router.post('/signup', validationSignup, createUser);
+// router.post('/signin', validationSignin, login);
+// router.post('/signup', validationSignup, createUser);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
