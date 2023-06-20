@@ -1,24 +1,23 @@
 const Card = require('../models/card');
-const {
-  RES_CODE_CREATED,
-  // ERROR_CODE_INCORRECT_DATA,
-  // ERROR_CODE_FORBIDDEN,
-  // ERROR_CODE_NOT_FOUND,
-  ERROR_CODE_DEFAULT,
-  defaultErrorMessage,
-} = require('../errors/errors');
+// const {
+//   RES_CODE_CREATED,
+//   ERROR_CODE_INCORRECT_DATA,
+//   ERROR_CODE_FORBIDDEN,
+//   ERROR_CODE_NOT_FOUND,
+//   ERROR_CODE_DEFAULT,
+//   defaultErrorMessage,
+// } = require('../errors/errors');
 
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const ForbiddenError = require('../errors/forbiddenError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card
     .find({})
     .populate('owner')
     .then((cards) => res.send(cards))
-    .catch(() => res.status(ERROR_CODE_DEFAULT)
-      .send({ message: defaultErrorMessage }));
+    .catch(next);
 };
 
 const createCard = (req, res, next) => {
@@ -32,12 +31,12 @@ const createCard = (req, res, next) => {
     link,
     owner: req.user._id,
   })
-    .then((card) => res.status(RES_CODE_CREATED)
+    .then((card) => res.status(201)
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные карточки'));
-      } return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
+      } return next(err);
     });
 };
 
@@ -58,8 +57,7 @@ const likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Переданы некорректные данные карточки'));
       }
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
@@ -81,8 +79,7 @@ const dislikeCard = (req, res, next) => {
         return next(BadRequestError('Переданы некорректные данные карточки'));
       }
 
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
@@ -102,7 +99,7 @@ const deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Переданы некорректные данные карточки'));
-      } return res.status(ERROR_CODE_DEFAULT).send({ message: defaultErrorMessage });
+      } return next(err);
     });
 };
 

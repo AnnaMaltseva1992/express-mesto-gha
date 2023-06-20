@@ -1,18 +1,18 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { RES_CODE_CREATED } = require('../errors/errors');
+// const { RES_CODE_CREATED } = require('../errors/errors');
 
 const NotFoundError = require('../errors/notFoundError');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 
-const {
-  // ERROR_CODE_INCORRECT_DATA,
-  // ERROR_CODE_NOT_FOUND,
-  ERROR_CODE_DEFAULT,
-  defaultErrorMessage,
-} = require('../errors/errors');
+// const {
+//   ERROR_CODE_INCORRECT_DATA,
+//   ERROR_CODE_NOT_FOUND,
+//   ERROR_CODE_DEFAULT,
+//   defaultErrorMessage,
+// } = require('../errors/errors');
 
 const getUsers = (req, res, next) => {
   User
@@ -33,8 +33,7 @@ const getUser = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
@@ -50,8 +49,7 @@ const getUserById = (req, res, next) => {
       if (err.name === 'DocumentNotFoundError') {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
@@ -72,7 +70,7 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.status(RES_CODE_CREATED)
+        .then((user) => res.status(201)
           .send(user))
         .catch((err) => {
           if (err.name === 'ValidationError') {
@@ -80,8 +78,7 @@ const createUser = (req, res, next) => {
           } if (err.code === 11000) {
             return next(new ConflictError('Выбранный вами email уже используется'));
           }
-          return res.status(ERROR_CODE_DEFAULT)
-            .send({ message: defaultErrorMessage });
+          return next(err);
         });
     });
 };
@@ -112,8 +109,7 @@ const updateUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные профиля'));
       }
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
@@ -137,12 +133,11 @@ const updateAvatar = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Переданы некорректные данные профиля'));
       }
-      return res.status(ERROR_CODE_DEFAULT)
-        .send({ message: defaultErrorMessage });
+      return next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -150,11 +145,7 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports = {
