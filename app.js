@@ -8,7 +8,7 @@ const helmet = require('helmet');
 
 const { login, createUser } = require('./controllers/users');
 
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 
 const handleErrors = require('./middlewares/handleErrors');
 
@@ -24,7 +24,7 @@ const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 
-// app.use(auth);
+app.use(auth);
 
 app.use(errors());
 app.use(helmet());
