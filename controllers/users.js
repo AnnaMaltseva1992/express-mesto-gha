@@ -36,9 +36,9 @@ const getUserById = (req, res, next) => {
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
-      // if (err.name === 'CastError') {
-      //   return next(new BadRequestError('Переданы некорректные данные пользователя'));
-      // }
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Переданы некорректные данные пользователя'));
+      }
       if (err.name === 'DocumentNotFoundError') {
         return next(new NotFoundError('Пользователь не найден'));
       }
@@ -63,8 +63,14 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.status(201)
-          .send(user))
+        .then((user) => res.status(201).send({
+          data: {
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+          },
+        }))
         .catch((err) => {
           if (err.name === 'ValidationError') {
             return next(new BadRequestError('Переданы некорректные данные пользователя'));
