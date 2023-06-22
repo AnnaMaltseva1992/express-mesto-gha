@@ -9,8 +9,8 @@ const { validationSignin, validationSignup } = require('../validation/validation
 router.post('/signin', validationSignin, login);
 router.post('/signup', validationSignup, createUser);
 
-router.use('/users', userRoutes);
-router.use('/cards', cardRoutes);
+router.use('/users', auth, userRoutes);
+router.use('/cards', auth, cardRoutes);
 
 router.use('/*', auth, (req, res, next) => {
   next(new NotFoundError('Профиль не найден'));
