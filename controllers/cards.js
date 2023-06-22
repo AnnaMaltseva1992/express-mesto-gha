@@ -75,25 +75,26 @@ const dislikeCard = (req, res, next) => {
     });
 };
 
-const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
-  Card
-    .findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        return next(new NotFoundError('Карточка не найдена'));
-      }
-      if (card.owner.toString() !== req.user._id) {
-        return next(new ForbiddenError('Вы не можете удалять карточки других пользователей'));
-      }
-      return res.send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Переданы некорректные данные карточки'));
-      } return next(err);
-    });
-};
+const deleteCard = (req, res, next) => Card.findById(req.params.cardId)
+  // eslint-disable-next-line consistent-return
+  .then((card) => {
+    if (!card) {
+      throw new NotFoundError('Карточка не найдена');
+    }
+    if (!card.owner.equals(req.user._id)) {
+      return next(new ForbiddenError('Вы не можете удалять карточки других пользователей'));
+    }
+    card.deleteOne()
+      .then(() => res.send({ message: 'Карточка удалена' }))
+      .catch(next);
+  })
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      next(new BadRequestError('Переданы некорректные данные карточки'));
+    } else {
+      next(err);
+    }
+  });
 
 module.exports = {
   getCards,

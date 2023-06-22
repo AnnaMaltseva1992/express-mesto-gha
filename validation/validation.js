@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 
-const LINK_REGEXP = /https?:\/\/(www\.)?\w+[-.~:/?#[\]@!$&'()*+,;=]*#?/;
+const LINK_REGEXP = /(https?:\/\/)(w{3}\.)?([a-zA-Z0-9-]{0,63}\.)([a-zA-Z]{2,4})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
 
 module.exports.validationSignin = celebrate({
   body: Joi.object().keys({
